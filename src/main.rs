@@ -40,7 +40,7 @@ async fn get_metric_statistics(
         .set_dimensions(Some(vec![dimension]))
         .send()
         .await
-        .unwrap();
+        .expect("Failed to get_metric_statistics");
 
     metric_statistics.datapoints().unwrap()[0].clone()
 }
