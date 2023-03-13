@@ -1,5 +1,7 @@
+pub mod models;
+
 use async_once_cell::OnceCell;
-use aws_sdk_dynamodb::Client;
+use aws_sdk_cloudwatch::Client;
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -7,7 +9,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub region: String,
-    pub table_name: String,
+    pub instance_id: String,
 }
 
 pub static CONFIG: Lazy<Config> = Lazy::new(|| {
