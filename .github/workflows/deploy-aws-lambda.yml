@@ -79,11 +79,6 @@ jobs:
             ./**/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-build-deploy
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: "npm"
-
       - name: Install zig
         run: npm install -g @ziglang/cli
 
