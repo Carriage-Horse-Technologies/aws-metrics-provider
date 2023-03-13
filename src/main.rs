@@ -17,7 +17,7 @@ async fn get_metric_statistics(
     metric_name: &str,
     start: DateTime<Utc>,
     end: DateTime<Utc>,
-) -> Datapoint {
+) -> Option<f64> {
     let client = CLIENT.get().unwrap();
 
     let dimension = Dimension::builder()
@@ -42,26 +42,30 @@ async fn get_metric_statistics(
         .await
         .expect("Failed to get_metric_statistics");
 
-    metric_statistics.datapoints().unwrap()[0].clone()
+    metric_statistics
+        .datapoints()
+        .unwrap()
+        .get(0)
+        .map(|p| p.average().unwrap_or_default())
 }
 
-async fn get_cpuutilization(start: DateTime<Utc>, end: DateTime<Utc>) -> Datapoint {
+async fn get_cpuutilization(start: DateTime<Utc>, end: DateTime<Utc>) -> Option<f64> {
     get_metric_statistics("CPUUtilization", start, end).await
 }
 
-async fn get_disk_read_bytes(start: DateTime<Utc>, end: DateTime<Utc>) -> Datapoint {
+async fn get_disk_read_bytes(start: DateTime<Utc>, end: DateTime<Utc>) -> Option<f64> {
     get_metric_statistics("DiskReadBytes", start, end).await
 }
 
-async fn get_disk_write_bytes(start: DateTime<Utc>, end: DateTime<Utc>) -> Datapoint {
+async fn get_disk_write_bytes(start: DateTime<Utc>, end: DateTime<Utc>) -> Option<f64> {
     get_metric_statistics("DiskWriteBytes", start, end).await
 }
 
-async fn get_network_in(start: DateTime<Utc>, end: DateTime<Utc>) -> Datapoint {
+async fn get_network_in(start: DateTime<Utc>, end: DateTime<Utc>) -> Option<f64> {
     get_metric_statistics("NetworkIn", start, end).await
 }
 
-async fn get_network_out(start: DateTime<Utc>, end: DateTime<Utc>) -> Datapoint {
+async fn get_network_out(start: DateTime<Utc>, end: DateTime<Utc>) -> Option<f64> {
     get_metric_statistics("NetworkOut", start, end).await
 }
 
@@ -76,26 +80,11 @@ async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
     let start = end - Duration::hours(1);
 
     let ec2_metric_statistics = Ec2MetricStatistics {
-        cpuutilization: get_cpuutilization(start, end)
-            .await
-            .average()
-            .unwrap_or_default(),
-        disk_read_bytes: get_disk_read_bytes(start, end)
-            .await
-            .average()
-            .unwrap_or_default(),
-        disk_write_bytes: get_disk_write_bytes(start, end)
-            .await
-            .average()
-            .unwrap_or_default(),
-        network_in: get_network_in(start, end)
-            .await
-            .average()
-            .unwrap_or_default(),
-        network_out: get_network_out(start, end)
-            .await
-            .average()
-            .unwrap_or_default(),
+        cpuutilization: get_cpuutilization(start, end).await.unwrap_or_default(),
+        disk_read_bytes: get_disk_read_bytes(start, end).await.unwrap_or_default(),
+        disk_write_bytes: get_disk_write_bytes(start, end).await.unwrap_or_default(),
+        network_in: get_network_in(start, end).await.unwrap_or_default(),
+        network_out: get_network_out(start, end).await.unwrap_or_default(),
     };
 
     let response = Response::builder()
