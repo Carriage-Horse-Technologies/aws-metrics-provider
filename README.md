@@ -21,7 +21,7 @@ cargo lambda build --release
 require: [Release build](#Release-build)
 
 ```Shell
-cargo lambda deploy
+cargo lambda deploy --enable-function-url --env-file <ENV_FILE> --role <ROLE>
 ```
 
 ## env
