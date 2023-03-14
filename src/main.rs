@@ -36,7 +36,7 @@ async fn get_metric_statistics(
         .set_statistics(Some(vec![Statistic::Average]))
         .set_namespace(Some("AWS/EC2".to_string()))
         .set_metric_name(Some(metric_name.to_string()))
-        .set_period(Some(5))
+        .set_period(Some(5 * 60))
         .set_dimensions(Some(vec![dimension]))
         .send()
         .await
