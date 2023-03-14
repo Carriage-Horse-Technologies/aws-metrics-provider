@@ -36,11 +36,15 @@ async fn get_metric_statistics(
         .set_statistics(Some(vec![Statistic::Average]))
         .set_namespace(Some("AWS/EC2".to_string()))
         .set_metric_name(Some(metric_name.to_string()))
-        .set_period(Some(3600))
+        .set_period(Some(5))
         .set_dimensions(Some(vec![dimension]))
         .send()
         .await
         .expect("Failed to get_metric_statistics");
+
+    let mut datapoint = metric_statistics.datapoints().unwrap().to_owned();
+    datapoint.sort_by_key(|k| k.timestamp().unwrap().secs());
+    datapoint.reverse();
 
     metric_statistics
         .datapoints()
@@ -77,7 +81,7 @@ async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
     // Extract some useful information from the request
 
     let end = chrono::Utc::now();
-    let start = end - Duration::hours(1);
+    let start = end - Duration::minutes(30);
 
     let ec2_metric_statistics = Ec2MetricStatistics {
         cpuutilization: get_cpuutilization(start, end).await.unwrap_or_default(),
