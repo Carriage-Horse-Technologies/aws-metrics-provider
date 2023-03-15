@@ -26,7 +26,6 @@ pub async fn get_legacy_stack_api() -> Result<f64, String> {
 pub struct Config {
     pub region: String,
     pub instance_id: String,
-    pub regacy_stack_api: String,
 }
 
 pub static CONFIG: Lazy<Config> = Lazy::new(|| {
