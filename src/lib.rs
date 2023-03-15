@@ -19,7 +19,7 @@ pub async fn get_legacy_stack_api() -> Result<f64, String> {
         return Err("Failed to json parse".to_string());
     };
 
-    Ok(json.cpuutilization * 100.)
+    Ok(json.cpuutilization)
 }
 
 #[derive(Debug, Deserialize)]
