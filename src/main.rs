@@ -83,14 +83,14 @@ async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
     let end = chrono::Utc::now();
     let start = end - Duration::minutes(30);
 
-    let cpuutilization = if let Ok(cpuutilization) = get_legacy_stack_api().await {
-        cpuutilization
-    } else {
-        get_cpuutilization(start, end).await.unwrap_or_default()
-    };
+    // let cpuutilization = if let Ok(cpuutilization) = get_legacy_stack_api().await {
+    //     cpuutilization
+    // } else {
+    //     get_cpuutilization(start, end).await.unwrap_or_default()
+    // };
 
     let ec2_metric_statistics = Ec2MetricStatistics {
-        cpuutilization,
+        cpuutilization: get_cpuutilization(start, end).await.unwrap_or_default(),
         disk_read_bytes: get_disk_read_bytes(start, end).await.unwrap_or_default(),
         disk_write_bytes: get_disk_write_bytes(start, end).await.unwrap_or_default(),
         network_in: get_network_in(start, end).await.unwrap_or_default(),
